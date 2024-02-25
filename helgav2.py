@@ -135,7 +135,7 @@ def main():
             if saves:
                 number_of_saves = len(saves)
             else:
-                print("Zero save data.")
+                number_of_saves = 0
 
             # Detect which save file to write on/over
             for index, save_slot in enumerate(LOADS):

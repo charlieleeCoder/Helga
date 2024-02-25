@@ -110,6 +110,8 @@ class Player():
             self.update_action(1) # 3: up
         elif self.right == True: 
             self.update_action(3) # 4 right
+        
+        # TODO: Expand bitmap list for other animation cycles
         # elif self.hit == True:
             # self.update_action(5) # getting hit
         # elif self.attacking == True:
@@ -143,6 +145,8 @@ class Player():
         narrow_attacks = self.y_tilt * self.rect.width
         tall_attacks = self.rect.height * self.y_tilt
         attacking_rect = pg.Rect(self.rect.centerx - fix_x_pos, self.rect.centery - fix_y_pos, 1.5 * self.rect.width - narrow_attacks, self.rect.height / 2 + tall_attacks)
+
+        # Attack which target
         if current_tile == 1 and attacking_rect.colliderect(skullies[0].rect):
             skullies[0].health -= 15
             skullies[0].hit = True

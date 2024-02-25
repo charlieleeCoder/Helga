@@ -158,14 +158,17 @@ class Enemy(ABC):
             self.y_tilt = True
         else:
             self.y_tilt = False
+        
+        # Orientation
         fix_x_pos = self.left * 1.5 * self.rect.width # If facing left, start the hitbox further left (-x)
         fix_y_pos = self.up * 1.5 * self.rect.height + ((self.rect.centery - self.rect.y) / 2) # If facing up, start the hitbox further up (-y) and also don't start hitbox at top of sprite but 3/4
         narrow_attacks = self.y_tilt * self.rect.width / 2
         tall_attacks = self.rect.height * self.y_tilt
+
+        # Attack
         attacking_rect = pg.Rect(self.rect.centerx - fix_x_pos, self.rect.centery - fix_y_pos, 1.5 * self.rect.width - narrow_attacks, self.rect.height / 2 + tall_attacks)
         if attacking_rect.colliderect(target.rect):
             target.health -= 8
-            print("Gotcha!")
             target.hit = True
             pg.draw.rect(surface, (0, 255, 0), attacking_rect)
 
