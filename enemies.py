@@ -1,6 +1,7 @@
 import pygame as pg
+from abc import ABC
 
-class Enemy():
+class Enemy(ABC):
     def __init__(self, enemy_type, x, y, data, sprite_sheet, animation_steps, enemy_locations): 
         self.enemy_type = enemy_type
         self.size = data[self.enemy_type][0]
@@ -17,7 +18,7 @@ class Enemy():
         self.right = False
         self.attacking = False
         self.hit = False
-        self.health = 50
+        self.health = None
         self.alive = True
         self.rect = pg.Rect((x, y, 64, 64))
         self.loop = 0
