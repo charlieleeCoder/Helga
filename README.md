@@ -3,13 +3,9 @@
 #### Description:
 For my final project, I decided to deep dive into Python. It was the only programming language I was semi-familiar with before the course and therefore an area of interest.
 
-I have previously made some basic games in Scratch and also using the pygame module and began a more ambitious 2d fighter game before starting this course that I got bored of before completing.
+I have previously made some basic games in Scratch and also using the pygame module and began a more ambitious 2d fighter game before starting this course that I didn't complete.
 
-I decided to recreate a top-down RPG, similar in spirit to Zelda, called Helga. I just started a role where I use SQL all the time, so the image of an evil server was somewhat low-hanging fruit. I decided to create the game as a 3 by 3 grid of tiles that get updated as the x and y positions change, moving the player back to the coordinates on the opposite side of the tile they just left.
-
-One of the challenges I faced, was that I was trying to implement a reusable objects for all enemies that would take in arguments for each tile to change the health, images, etc. but everytime I implemented a tweak that would resolve one problem, it caused another. For instance, the update current_tile function was called before the defeated function and would feed in the tile I had just moved to, rather than the one I had just defeated the enemy on. I tried swapping the order around, but the update current_tile function was responsible for blitting the backgrounds and if moved later (defeated had to be called after move), the background would be presented infront of the characters. It ended up being far easier creating an object for each instance of an enemy, although I appreciate this wouldn't be as scalable.
-
-Also, I tried to feed in a list of animations that would update and though this worked, I couldn't get the scale feature to to work as intended.
+I decided to recreate a top-down RPG, similar in spirit to Zelda, called Helga. I just started a role where I use SQL all the time, so the image of an evil server was low-hanging fruit. I decided to create the game as a 3 by 3 grid of tiles that get updated as the x and y positions change, moving the player back to the coordinates on the opposite side of the tile they just left.
 
 I think more than anything I learnt about feature creep. I implemented a load feature and a new game feature. However, I never actually implemented a save feature, other than the one that happens as you start a new game in a save slot. However, you can run a seperate sqlite3 query to change the starting tile.
 
