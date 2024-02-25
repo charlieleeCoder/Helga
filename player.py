@@ -18,7 +18,7 @@ class Player():
         self.attack_cooldown = 0
         self.hit = False
         self.health = 100
-        self.alive = True
+        self._defeated = False
         self.rect = pg.Rect((x, y, 64, 96))
         self.current_tile = 3
         self.y_tilt = False
@@ -46,10 +46,10 @@ class Player():
         # Can only perform other actions if not attacking or dead
         if self.health <= 0:   
             self.health = 0   
-            self.alive = False   
+            self._defeated = True   
             # self.update_action(6)
 
-        if not self.attacking and self.alive:
+        if not self.attacking and not self._defeated:
 
             # Check keyboard input
             if key[pg.K_a]:          # movement
@@ -124,55 +124,51 @@ class Player():
     # check if the animation has finished
         if self.frame_index >= len(self.animation_list[self.action]):
         # if the player is dead then end the animation_list
-            if self.alive ==  False:
+            if self._defeated ==  True:
                 self.frame_index = len(self.animation_list[self.action]) - 1
             else:
                 self.frame_index = 0
                 self.hit = False
 
     def attack(self, current_tile, surface, skullies, blobs, boss):     # pg.Rect((x, y, 64, 96))
+        # Player orientation
         if self.up or self.down:
             self.y_tilt = True
         else:
             self.y_tilt = False
         fix_x_pos = self.left * 1.5 * self.rect.width # If facing left, start the hitbox further left (-x)
         fix_y_pos = self.up * 1.5 * self.rect.height + ((self.rect.centery - self.rect.y) / 2) # If facing up, start the hitbox further up (-y) and also don't start hitbox at top of sprite but 3/4
+        
+        # Horizontal versus vertical attacks
         narrow_attacks = self.y_tilt * self.rect.width
         tall_attacks = self.rect.height * self.y_tilt
         attacking_rect = pg.Rect(self.rect.centerx - fix_x_pos, self.rect.centery - fix_y_pos, 1.5 * self.rect.width - narrow_attacks, self.rect.height / 2 + tall_attacks)
         if current_tile == 1 and attacking_rect.colliderect(skullies[0].rect):
             skullies[0].health -= 15
-            print("Ha!")
             skullies[0].hit = True
             pg.draw.rect(surface, (0, 255, 0), attacking_rect)
         if current_tile == 4 and attacking_rect.colliderect(skullies[1].rect):
             skullies[1].health -= 15
-            print("Ha!")
             skullies[1].hit = True
             pg.draw.rect(surface, (0, 255, 0), attacking_rect)
         if current_tile == 7 and attacking_rect.colliderect(skullies[2].rect):
             skullies[2].health -= 15
-            print("Ha!")
             skullies[2].hit = True
             pg.draw.rect(surface, (0, 255, 0), attacking_rect)
         if current_tile == 2 and attacking_rect.colliderect(blobs[0].rect):
             blobs[0].health -= 15
-            print("Ha!")
             blobs[0].hit = True
             pg.draw.rect(surface, (0, 255, 0), attacking_rect)       
         if current_tile == 6 and attacking_rect.colliderect(blobs[1].rect):
             blobs[1].health -= 15
-            print("Ha!")
             blobs[1].hit = True
             pg.draw.rect(surface, (0, 255, 0), attacking_rect)     
         if current_tile == 9 and attacking_rect.colliderect(blobs[2].rect):
             blobs[2].health -= 15
-            print("Ha!")
             blobs[2].hit = True
             pg.draw.rect(surface, (0, 255, 0), attacking_rect)     
         if attacking_rect.colliderect(boss.rect):
             boss.health -= 15
-            print("Ha!")
             boss.hit = True
             pg.draw.rect(surface, (0, 255, 0), attacking_rect)
 
@@ -207,8 +203,7 @@ class Player():
 
     def defeated(self):
         if self.health <= 0:
-            self.alive = False
-            # print("Noooo!")
-        return self.alive
+            self._defeated = True
+        return self._defeated
 
 

@@ -21,6 +21,7 @@ O_BUTTON = Button(350, 560, OPTIONS)
 LOAD1_BUTTON = Button(30, 35, LOAD_P1)
 LOAD2_BUTTON = Button(30, 276, LOAD_P2)
 LOAD3_BUTTON = Button(30, 521, LOAD_P3)
+LOADS = [LOAD1_BUTTON, LOAD2_BUTTON, LOAD3_BUTTON]
 
 # Set framerate
 clock = pg.time.Clock()
@@ -119,13 +120,13 @@ def main():
         elif state == "main_menu": 
             WINDOW.blit(MENU, (0, 0))
             if NG_BUTTON.draw(WINDOW):
-                print("New Game")
+                # print("New Game")
                 state = "new_game"
             if C_BUTTON.draw(WINDOW):
-                print("Continue")
+                # print("Continue")
                 state = "continue"
             if O_BUTTON.draw(WINDOW):
-                print("Options")
+                # print("Options")
                 state = "options"
             
 
@@ -141,46 +142,25 @@ def main():
                 print("Zero save data.")
 
             # Detect which save file to write on/over
-            if LOAD1_BUTTON.draw(WINDOW):
-                if not saves:
-                    new_save()
-                else:
-                    replace_save(1)
-                state = "main"
-            if LOAD2_BUTTON.draw(WINDOW):
-                if not saves:
-                    new_save()
-                else:
-                    if number_of_saves > 1:
-                        replace_save(2)
+            for index, save_slot in enumerate(LOADS):
+                if save_slot.draw(WINDOW):
+                    if not saves:
+                        new_save()
+                    elif number_of_saves > index:
+                        replace_save(index+1)
                     else:
                         new_save()
-                state = "main"
-            if LOAD3_BUTTON.draw(WINDOW):
-                if not saves:
-                    new_save()
-                else:
-                    if number_of_saves > 2:
-                        replace_save(3)
-                    else:
-                        new_save()
-                state = "main"
-            new_game = True
-
+                    state = "main"
+                    new_game = True
 
         # Handle load game
         if state == "continue":
             WINDOW.blit(LOAD, (0, 0))
-            if LOAD1_BUTTON.draw(WINDOW):
-                load_data = load_file(1)
-                state = "main"
-            if LOAD2_BUTTON.draw(WINDOW):
-                load_data = load_file(2)
-                state = "main"
-            if LOAD3_BUTTON.draw(WINDOW):
-                load_data = load_file(3)
-                state = "main"
-            new_game = False
+            for index, load_button in enumerate(LOADS):
+                if load_button.draw(WINDOW):
+                    load_data = load_file(index+1)
+                    state = "main"
+                    new_game = False
 
         # Handle options
         if state == "options":  
@@ -235,9 +215,7 @@ def main():
                     blob2.draw(WINDOW)
                     blob2.move(current_tile, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW, player_1)
                     # And mark as dead
-                    if not blob2.defeated():
-                        print("I'm dead blobby!")
-                        print(current_tile)
+                    if blob2.defeated():
                         defeated[2] = True
 
             # Handle updates of blob 6
@@ -246,9 +224,7 @@ def main():
                     blob6.draw(WINDOW)
                     blob6.move(current_tile, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW, player_1)
                     # And mark as dead
-                    if not blob6.defeated():
-                        print("I'm dead blobby!")
-                        print(current_tile)
+                    if blob6.defeated():
                         defeated[6] = True
 
             # Handle updates of blob 9
@@ -257,9 +233,7 @@ def main():
                     blob9.draw(WINDOW)
                     blob9.move(current_tile, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW, player_1)
                     # And mark as dead
-                    if not blob9.defeated():
-                        print("I'm dead blobby!")
-                        print(current_tile)
+                    if blob9.defeated():
                         defeated[9] = True
 
             # Handle updates of Skullie 1
@@ -268,9 +242,7 @@ def main():
                     skullie1.draw(WINDOW)
                     skullie1.move(current_tile, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW, player_1)
                     # And mark as dead
-                    if not skullie1.defeated():
-                        print(current_tile)
-                        print("Killing blow on skullie's head!")
+                    if skullie1.defeated():
                         defeated[1] = True
 
             # Handle updates of Skullie 4
@@ -279,9 +251,7 @@ def main():
                     skullie4.draw(WINDOW)
                     skullie4.move(current_tile, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW, player_1)
                     # And mark as dead
-                    if not skullie4.defeated():
-                        print(current_tile)
-                        print("Killing blow on skullie's head!")
+                    if skullie4.defeated():
                         defeated[4] = True
 
             # Handle updates of Skullie 7
@@ -290,9 +260,7 @@ def main():
                     skullie7.draw(WINDOW)
                     skullie7.move(current_tile, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW, player_1)
                     # And mark as dead
-                    if not skullie7.defeated():
-                        print(current_tile)
-                        print("Killing blow on skullie's head!")
+                    if skullie7.defeated():
                         defeated[7] = True
 
             # Create boss battle
@@ -301,17 +269,17 @@ def main():
                 final_boss.draw(WINDOW)
                 final_boss.move(3, SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW, player_1)
                 draw_health_bar(final_boss.health, 110, 720, 2)
-                if not final_boss.defeated():
+                if final_boss.defeated():
                     boss_defeated = True
 
 
             # If victory
             if defeated[1] and defeated[2] and defeated[4] and defeated[6] and defeated[7] and defeated[9] and boss_defeated:
                 draw_text('Victory!', victory_font, (255, 0, 0), int(SCREEN_WIDTH / 2 - 185), int(SCREEN_HEIGHT) / 3)
-            if not player_1.defeated():
+            if player_1.defeated():
                 draw_text('Game Over!', victory_font, (255, 0, 0), int(SCREEN_WIDTH / 2 - 300), int(SCREEN_HEIGHT) / 3)
 
-        # Update screen
+        # Update screendddd
         pg.display.update()
     
     pg.quit()

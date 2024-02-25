@@ -19,7 +19,7 @@ class Enemy(ABC):
         self.attacking = False
         self.hit = False
         self.health = None
-        self.alive = True
+        self._defeated = False
         self.rect = pg.Rect((x, y, 64, 64))
         self.loop = 0
         self.attack_cooldown = 0
@@ -48,7 +48,7 @@ class Enemy(ABC):
             print("This cruel world!") 
         #     self.defeated(current_tile)  
 
-        if not self.attacking and self.alive:
+        if not self.attacking and not self._defeated:
             # Check keyboard input
             if self.loop == 0:          # movement
                 dx = -SPEED
@@ -126,7 +126,7 @@ class Enemy(ABC):
     # check if the animation has finished
         if self.frame_index >= len(self.animation_list[self.action]):
         # if the player is dead then end the animation_list
-            if self.alive ==  False:
+            if self.defeated():
                 self.frame_index = len(self.animation_list[self.action]) - 1
             else:
                 self.frame_index = 0
@@ -141,17 +141,17 @@ class Enemy(ABC):
             self.update_time = pg.time.get_ticks()
 
     def draw(self, surface):
-        if self.alive:
+        if not self.defeated():
             # pg.draw.rect(surface, (255, 0, 0), self.rect)
             surface.blit(self.image, (self.rect.x - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)))
 
     def defeated(self):
         if self.health <= 0:
-            self.alive = False
+            self._defeated = True
             # print("Gaaahh!")
         else:
-            self.alive = True
-        return self.alive
+            self._defeated = False
+        return self._defeated
 
     def attack(self, surface, target):     # pg.Rect((x, y, 64, 96))
         if self.up or self.down:
