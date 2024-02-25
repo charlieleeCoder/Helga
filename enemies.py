@@ -171,6 +171,7 @@ class Enemy(ABC):
             target.health -= 8
             target.hit = True
             pg.draw.rect(surface, (0, 255, 0), attacking_rect)
+        self.attacking = False
 
 class Blob(Enemy):
     def __init__(self, enemy_type, x, y, data, sprite_sheet, animation_steps, enemy_locations):
