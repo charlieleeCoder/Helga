@@ -15,9 +15,12 @@ pg.display.set_caption('Helga')
 from art import *
 
 # Create Buttons
-NG_BUTTON = Button(350, 400, NEW_GAME)
-C_BUTTON = Button(350, 480, CONTINUE)
-O_BUTTON = Button(350, 560, OPTIONS)
+NG_BUTTON = Button(350, 400, NEW_GAME, 'new_game')
+C_BUTTON = Button(350, 480, CONTINUE, 'continue')
+O_BUTTON = Button(350, 560, OPTIONS, 'options')
+BUTTONS = [NG_BUTTON, C_BUTTON, O_BUTTON]
+
+# Manage saves
 LOAD1_BUTTON = Button(30, 35, LOAD_P1)
 LOAD2_BUTTON = Button(30, 276, LOAD_P2)
 LOAD3_BUTTON = Button(30, 521, LOAD_P3)
@@ -119,16 +122,9 @@ def main():
         # Handle main menu screen
         elif state == "main_menu": 
             WINDOW.blit(MENU, (0, 0))
-            if NG_BUTTON.draw(WINDOW):
-                # print("New Game")
-                state = "new_game"
-            if C_BUTTON.draw(WINDOW):
-                # print("Continue")
-                state = "continue"
-            if O_BUTTON.draw(WINDOW):
-                # print("Options")
-                state = "options"
-            
+            for button in BUTTONS:
+                if button.draw(WINDOW):
+                    state = button.state
 
         # Handle new game scenario
         if state == "new_game":

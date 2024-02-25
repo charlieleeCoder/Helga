@@ -1,11 +1,13 @@
 import pygame as pg
 
 class Button():
-    def __init__(self, x, y, image):
+    def __init__(self, x, y, image, state=None):
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.clicked = False
+        self.state = state
+
     
     def draw(self, WINDOW):
         action = False
