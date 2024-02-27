@@ -11,7 +11,7 @@ LOAD_P1 = pg.image.load('Art\Load1.jpeg').convert_alpha()
 LOAD_P2 = pg.image.load('Art\Load2.jpeg').convert_alpha()
 LOAD_P3 = pg.image.load('Art\Load3.jpeg').convert_alpha()
 
-JOIN_SPRITESHEET = pg.image.load('Art\Player-Sheet.png').convert_alpha()
+JOIN_SPRITESHEET = pg.image.load('Art\character_blue.png').convert_alpha()
 BLOB_SPRITESHEET = pg.image.load('Art\Blob-Sheet.png').convert_alpha()
 SKULLIE_SPRITESHEET = pg.image.load('Art\Skullie-Sheet.png').convert_alpha()
 BOSS_SPRITESHEET = pg.image.load('Art\Boss-Sheet.png').convert_alpha()

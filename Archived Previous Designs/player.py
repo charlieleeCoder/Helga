@@ -2,16 +2,18 @@ import pygame as pg
 
 class Player():
     def __init__(self, x, y, data, sprite_sheet, animation_steps): 
-        self.flip = False
         self.size = data[0]
-        self.image_scale = data[1]
-        self.offset = data[2]
+        self.image_scale = data [1]
+        self.offset = data [2]
         self.animation_list = self.load_images(sprite_sheet, animation_steps)
         self.action = 0 # 0 = idle, etc.
         self.frame_index = 0
         self.image = self.animation_list[self.action][self.frame_index]
         self.update_time = pg.time.get_ticks()   # or not?
-        self.up, self.down, self.left, self.right = False, False, False, False
+        self.up = False
+        self.down = False
+        self.left = False
+        self.right = False
         self.attacking = False
         self.attack_cooldown = 0
         self.hit = False
@@ -33,10 +35,10 @@ class Player():
             animation_list.append(temp_img_list)
         return animation_list
 
-    def move(self, current_tile, screen_width, screen_height, surface, enemy_list, boss): # target variable needs adding back in
+    def move(self, current_tile, screen_width, screen_height, surface, skullies, blobs, boss): # target variable needs adding back in
         SPEED = 15
-        self.dx = 0
-        self.dy = 0
+        dx = 0
+        dy = 0
 
         # get key presses
         key = pg.key.get_pressed()
@@ -45,55 +47,50 @@ class Player():
         if self.health <= 0:   
             self.health = 0   
             self._defeated = True   
-            self.update_action(7)
+            # self.update_action(6)
 
-        # If still alive
-        if not self._defeated:
+        if not self.attacking and not self._defeated:
 
-            # Movement
-            if key[pg.K_a]:          
-                self.dx = -SPEED
+            # Check keyboard input
+            if key[pg.K_a]:          # movement
+                dx = -SPEED
                 self.left = True
-                self.flip = True
                 self.right, self.up, self.down = False, False, False
-            elif key[pg.K_d]:
-                self.dx = SPEED
+            if key[pg.K_d]:
+                dx = SPEED
                 self.right = True
-                self.flip = False
                 self.left, self.up, self.down = False, False, False
-            elif key[pg.K_w]:             
-                self.dy = -SPEED
+            if key[pg.K_w]:             
+                dy = -SPEED
                 self.up = True
                 self.left, self.right, self.down = False, False, False
-            elif key[pg.K_s]:
-                self.dy = SPEED
+            if key[pg.K_s]:
+                dy = SPEED
                 self.down = True
                 self.left, self.right, self.up = False, False, False
+
             # Attack
-            elif key[pg.K_SPACE]:
+            if key[pg.K_SPACE]:
                 if self.attack_cooldown == 0:
                     self.attacking = True
-                    self.left, self.right = False, False
-                    self.attack(current_tile, surface, enemy_list, boss)
-                    # self.attack_type = 5
+                    self.attack(current_tile, surface, skullies, blobs, boss)
+                    self.attack_type = 5
                     self.attack_cooldown = 22
-            else:
-                self.left, self.right, self.attacking = False, False, False
-        
+            self.attacking = False
 
         # Ensure player stays within outer boundary
-        if self.rect.left + self.dx < 0 and current_tile % 3 == 1:
-            self.dx = 0 - self.rect.left
-        if self.rect.right + self.dx > screen_width and current_tile % 3 == 0:
-            self.dx = screen_width - self.rect.right
-        if self.rect.bottom + self.dy > screen_height and current_tile < 4:
-            self.dy = screen_height - self.rect.bottom
-        if self.rect.top + self.dy < 0 and current_tile > 6:
-            self.dy = 0 - self.rect.top
+        if self.rect.left + dx < 0 and current_tile % 3 == 1:
+            dx = 0 - self.rect.left
+        if self.rect.right + dx > screen_width and current_tile % 3 == 0:
+            dx = screen_width - self.rect.right
+        if self.rect.bottom + dy > screen_height and current_tile < 4:
+            dy = screen_height - self.rect.bottom
+        if self.rect.top + dy < 0 and current_tile > 6:
+            dy = 0 - self.rect.top
 
         # Update player position
-        self.rect.x += self.dx
-        self.rect.y += self.dy
+        self.rect.x += dx
+        self.rect.y += dy
 
         # Apply attack cool down
         if self.attack_cooldown > 0:
@@ -105,28 +102,28 @@ class Player():
         self.image = self.animation_list[self.action][self.frame_index]
 
         # check what action the player is performing
-        if self.left:
-            self.update_action(2) 
-        elif self.right: 
-            self.update_action(2) 
-        elif self.down and self.dy != 0:
-            self.update_action(2) 
-        elif self.up and self.dy != 0:
-            self.update_action(2) 
-
-        # Expand bitmap list for other animation cycles
-        elif self.hit:
-            self.update_action(5) # getting hit
-        elif self.attacking:
-            self.update_action(1) # attacking
-        else:
-            self.update_action(0) # 0:idle
+        if self.left == True:
+            self.update_action(2) # 1: left
+        elif self.down == True:
+            self.update_action(0) # 2: down
+        elif self.up == True:
+            self.update_action(1) # 3: up
+        elif self.right == True: 
+            self.update_action(3) # 4 right
+        
+        # TODO: Expand bitmap list for other animation cycles
+        # elif self.hit == True:
+            # self.update_action(5) # getting hit
+        # elif self.attacking == True:
+            # self.update_action(6) # attacking
+        # else:
+            # self.update_action(4) # 0:idle
 
         # check if enough time has passed since the last update
         if pg.time.get_ticks() - self.update_time > animation_cooldown:
             self.frame_index += 1
             self.update_time = pg.time.get_ticks()
-        # check if the animation has finished
+    # check if the animation has finished
         if self.frame_index >= len(self.animation_list[self.action]):
         # if the player is dead then end the animation_list
             if self._defeated ==  True:
@@ -135,7 +132,7 @@ class Player():
                 self.frame_index = 0
                 self.hit = False
 
-    def attack(self, current_tile, surface, enemy_list, boss):     # pg.Rect((x, y, 64, 96))
+    def attack(self, current_tile, surface, skullies, blobs, boss):     # pg.Rect((x, y, 64, 96))
         # Player orientation
         if self.up or self.down:
             self.y_tilt = True
@@ -150,21 +147,34 @@ class Player():
         attacking_rect = pg.Rect(self.rect.centerx - fix_x_pos, self.rect.centery - fix_y_pos, 1.5 * self.rect.width - narrow_attacks, self.rect.height / 2 + tall_attacks)
 
         # Attack which target
-        try:
-            if attacking_rect.colliderect(enemy_list[current_tile].rect):
-                enemy_list[current_tile].health -= 15
-                enemy_list[current_tile].hit = True
-                pg.draw.rect(surface, (0, 255, 0), attacking_rect)     
-        except AttributeError: 
-            pass
-        # Deal with variable lag
-        try:
-            if attacking_rect.colliderect(boss.rect):
-                boss.health -= 12
-                boss.hit = True
-                pg.draw.rect(surface, (0, 255, 0), attacking_rect)
-        except AttributeError: 
-            pass
+        if current_tile == 1 and attacking_rect.colliderect(skullies[0].rect):
+            skullies[0].health -= 15
+            skullies[0].hit = True
+            pg.draw.rect(surface, (0, 255, 0), attacking_rect)
+        if current_tile == 4 and attacking_rect.colliderect(skullies[1].rect):
+            skullies[1].health -= 15
+            skullies[1].hit = True
+            pg.draw.rect(surface, (0, 255, 0), attacking_rect)
+        if current_tile == 7 and attacking_rect.colliderect(skullies[2].rect):
+            skullies[2].health -= 15
+            skullies[2].hit = True
+            pg.draw.rect(surface, (0, 255, 0), attacking_rect)
+        if current_tile == 2 and attacking_rect.colliderect(blobs[0].rect):
+            blobs[0].health -= 15
+            blobs[0].hit = True
+            pg.draw.rect(surface, (0, 255, 0), attacking_rect)       
+        if current_tile == 6 and attacking_rect.colliderect(blobs[1].rect):
+            blobs[1].health -= 15
+            blobs[1].hit = True
+            pg.draw.rect(surface, (0, 255, 0), attacking_rect)     
+        if current_tile == 9 and attacking_rect.colliderect(blobs[2].rect):
+            blobs[2].health -= 15
+            blobs[2].hit = True
+            pg.draw.rect(surface, (0, 255, 0), attacking_rect)     
+        if attacking_rect.colliderect(boss.rect):
+            boss.health -= 15
+            boss.hit = True
+            pg.draw.rect(surface, (0, 255, 0), attacking_rect)
 
     def update_action(self, new_action):
         # check if the new action is different to previous one
@@ -175,9 +185,8 @@ class Player():
             self.update_time = pg.time.get_ticks()
 
     def draw(self, surface):
-        img = pg.transform.flip(self.image, self.flip, False)
         # pg.draw.rect(surface, (255, 0, 0), self.rect)
-        surface.blit(img, (self.rect.x - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)))
+        surface.blit(self.image, (self.rect.x - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)))
 
     def update_tiles(self, WINDOW, current_tile, TILE_LIST, SCREEN_WIDTH, SCREEN_HEIGHT):
         tilename = TILE_LIST[(current_tile)]

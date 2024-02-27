@@ -2,14 +2,23 @@ import pygame as pg
 from abc import ABC
 
 class Enemy(ABC):
-    def __init__(self, x, y, data, sprite_sheet, animation_steps): 
+    def __init__(self, enemy_type, x, y, data, sprite_sheet, animation_steps, enemy_locations): 
+        self.enemy_type = enemy_type
+        self.size = data[self.enemy_type][0]
+        self.image_scale = data[self.enemy_type][1]
+        self.offset = data[self.enemy_type][2]
+        self.animation_list = self.load_images(sprite_sheet[self.enemy_type], animation_steps[self.enemy_type])
         self.action = 0 # 0 = idle, etc.
         self.frame_index = 0
+        self.image = self.animation_list[self.action][self.frame_index]
         self.update_time = pg.time.get_ticks()   # or not?
-        self.up, self.down, self.left, self.right  = False, False, False, False
+        self.up = False
+        self.down = False
+        self.left = False
+        self.right = False
         self.attacking = False
         self.hit = False
-        self.alive = True
+        self.health = None
         self._defeated = False
         self.rect = pg.Rect((x, y, 64, 64))
         self.loop = 0
@@ -31,6 +40,7 @@ class Enemy(ABC):
         SPEED = 20
         dx = 0
         dy = 0
+        # print(self.health)
 
         # Can only perform other actions if not attacking or dead
         if self.health <= 0:   
@@ -132,17 +142,18 @@ class Enemy(ABC):
 
     def draw(self, surface):
         if not self.defeated():
-            pg.draw.rect(surface, (255, 0, 0), self.rect)
+            # pg.draw.rect(surface, (255, 0, 0), self.rect)
             surface.blit(self.image, (self.rect.x - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)))
 
     def defeated(self):
         if self.health <= 0:
             self._defeated = True
+            # print("Gaaahh!")
         else:
             self._defeated = False
         return self._defeated
 
-    def attack(self, surface, target):     
+    def attack(self, surface, target):     # pg.Rect((x, y, 64, 96))
         if self.up or self.down:
             self.y_tilt = True
         else:
@@ -163,39 +174,34 @@ class Enemy(ABC):
         self.attacking = False
 
 class Blob(Enemy):
-    def __init__(self, x, y, data, sprite_sheet, animation_steps):
-        super().__init__(x, y, data, sprite_sheet, animation_steps)
+    def __init__(self, enemy_type, x, y, data, sprite_sheet, animation_steps, enemy_locations):
+        super().__init__(enemy_type, x, y, data, sprite_sheet, animation_steps, enemy_locations)
         self.health = 50
-        self._ = 0
-        self.size =  data[self._][0]
-        self.image_scale = data[self._][1]
-        self.offset = data[self._][2]
-        self.animation_list = self.load_images(sprite_sheet[self._], animation_steps[self._])
-        self.image = self.animation_list[self.action][self.frame_index]
+        self.alive = True
+        self.enemy_type = 1
+        self.image_scale = data[1][1]
+        self.offset = data[1][2]
+        self.animation_list = self.load_images(sprite_sheet[1], animation_steps[1])
 
 class Skullie(Enemy):
-    def __init__(self, x, y, data, sprite_sheet, animation_steps):
-        super().__init__(x, y, data, sprite_sheet, animation_steps)
+    def __init__(self, enemy_type, x, y, data, sprite_sheet, animation_steps, enemy_locations):
+        super().__init__(enemy_type, x, y, data, sprite_sheet, animation_steps, enemy_locations)
         self.health = 50
-        self._ = 1
-        self.size =  data[self._][0]
-        self.image_scale = data[self._][1]
-        self.offset = data[self._][2]
-        self.animation_list = self.load_images(sprite_sheet[self._], animation_steps[self._])
-        self.image = self.animation_list[self.action][self.frame_index]
+        self.alive = True
+        self.enemy_type = 2
+        self.image_scale = data[1][1]
+        self.offset = data[2][2]
+        self.animation_list = self.load_images(sprite_sheet[2], animation_steps[2])
 
 class Boss(Enemy):
-    def __init__(self, x, y, data, sprite_sheet, animation_steps):
-        super().__init__(x, y, data, sprite_sheet, animation_steps)
+    def __init__(self, enemy_type, x, y, data, sprite_sheet, animation_steps, enemy_locations):
+        super().__init__(enemy_type, x, y, data, sprite_sheet, animation_steps, enemy_locations)
         self.health = 200
-        self._ = 2
-        self.size =  data[self._][0]
-        # Need a bigger rect for boss collisions
         self.rect = pg.Rect((x, y, 192, 192))
-        self.image_scale = data[self._][1]
-        self.offset = data[self._][2]
-        self.animation_list = self.load_images(sprite_sheet[self._], animation_steps[self._])
-        self.image = self.animation_list[self.action][self.frame_index]
+        self.enemy_type = 3
+        self.image_scale = data[3][1]
+        self.offset = data[3][2]
+        self.animation_list = self.load_images(sprite_sheet[3], animation_steps[3])
 
 
 
